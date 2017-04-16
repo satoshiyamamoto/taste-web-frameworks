@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost/taste-waf
+    url: jdbc:postgresql://${DATABASE_HOST}/taste-waf
     username: root
     password: root
   jpa:
