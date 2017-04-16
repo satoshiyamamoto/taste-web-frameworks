@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/taste-waf
+    username: root
+    password: root
+  jpa:
+    database: postgresql
+    generate-ddl: true
+    show-sql: true
