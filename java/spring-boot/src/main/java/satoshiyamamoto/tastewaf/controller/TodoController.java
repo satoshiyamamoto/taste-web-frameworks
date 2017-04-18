@@ -3,6 +3,7 @@ package satoshiyamamoto.tastewaf.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import satoshiyamamoto.tastewaf.entity.Todo;
 import satoshiyamamoto.tastewaf.repository.TodoRepository;
@@ -20,26 +21,30 @@ public class TodoController {
     }
 
     @PostMapping
-    public Todo create(@RequestBody Todo todo) {
-        return repository.save(todo);
+    public ResponseEntity create(@RequestBody Todo todo) {
+
+        Todo entity = repository.save(todo);
+        return new ResponseEntity<>(entity, HttpStatus.CREATED);
     }
 
     @PutMapping("{id}")
-    public Todo update(@PathVariable("id") Long id,
-                       @RequestBody Todo todo) {
-        if (!repository.exists(id)) throw new NotFoundException();
+    public ResponseEntity update(@PathVariable("id") Long id,
+                                 @RequestBody Todo todo) {
+        if (!repository.exists(id)) return ResponseEntity.notFound().build();
 
         Todo entity = repository.findOne(id);
         entity.setTitle(todo.getTitle());
         entity.setCompleted(todo.isCompleted());
-        return repository.save(entity);
+        repository.save(entity);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("{id}")
-    public void destroy(@PathVariable("id") Long id) {
-        if (!repository.exists(id)) throw new NotFoundException();
+    public ResponseEntity destroy(@PathVariable("id") Long id) {
+        if (!repository.exists(id)) return ResponseEntity.notFound().build();
 
         repository.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
@@ -49,13 +54,10 @@ public class TodoController {
     }
 
     @GetMapping("{id}")
-    public Todo show(@PathVariable("id") Long id) {
-        if (!repository.exists(id)) throw new NotFoundException();
+    public ResponseEntity show(@PathVariable("id") Long id) {
+        if (!repository.exists(id)) return ResponseEntity.notFound().build();
 
-        return repository.findOne(id);
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    private static class NotFoundException extends RuntimeException {
+        Todo todo = repository.findOne(id);
+        return ResponseEntity.ok(todo);
     }
 }
