@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DATABASE_HOST}/taste-waf
-    username: root
-    password: root
+    url: jdbc:hsqldb:file:/tmp/taste-waf
+    username: SA
+    password:
   jpa:
-    database: postgresql
+    database: hsql
     generate-ddl: true
     show-sql: true
