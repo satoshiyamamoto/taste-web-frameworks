@@ -4,6 +4,4 @@ spring:
     username: SA
     password:
   jpa:
-    database: hsql
-    generate-ddl: true
     show-sql: true
