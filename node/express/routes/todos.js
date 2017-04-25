@@ -39,6 +39,7 @@ router.get('/:id', (req, res, next) => {
 
   Todo.findById(id).then((todo) => {
       if (!todo) return next(notFound());
+
       res.json(todo);
     })
     .catch(handleError(next));
@@ -64,6 +65,7 @@ router.put('/:id', (req, res, next) => {
 
   Todo.findById({ _id: id }).then((todo) => {
       if (!todo) return next(notFound());
+
       const newTodo = Object.assign(todo, req.body);
       return newTodo.save();
     }).then(() => {
@@ -80,6 +82,7 @@ router.delete('/:id', (req, res, next) => {
 
   Todo.findById({ _id: id }).then(todo => {
       if (!todo) return next(notFound());
+
       return Todo.remove({ _id: id });
     }).then(() => {
       res.status(204).end();
