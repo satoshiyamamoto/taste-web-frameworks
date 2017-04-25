@@ -15,9 +15,7 @@ todoSchema.pre('save', next => {
   if (!this.createdAt) {
     this.createdAt = now;
   }
-  if (!this.updatedAt) {
-    this.updatedAt = now;
-  }
+  this.updatedAt = now;
   next();
 });
 

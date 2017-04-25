@@ -15,8 +15,11 @@ db.on('error', console.error.bind(console, 'connection error:'));
 
 var app = express();
 
+if (process.env.NODE_ENV !== 'test') {
+  app.use(logger('dev'));
+}
+
 // uncomment after placing your favicon in /public
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/json' }));
 app.use(bodyParser.urlencoded({ extended: false }));
