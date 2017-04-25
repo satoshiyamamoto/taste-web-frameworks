@@ -32,6 +32,14 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+  switch (err.name) {
+    case 'ValidationError':
+      err.status = 422;
+      break;
+    default:
+      // nop
+   }
+
   // set error, only providing error in development
   const error = req.app.get('env') === 'development' ? err : {};
   const status = err.status || 500;
