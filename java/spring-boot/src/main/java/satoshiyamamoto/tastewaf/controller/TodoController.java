@@ -1,10 +1,11 @@
 package satoshiyamamoto.tastewaf.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import satoshiyamamoto.tastewaf.entity.Todo;
 import satoshiyamamoto.tastewaf.repository.TodoRepository;
@@ -15,25 +16,22 @@ import java.util.List;
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
-    private TodoRepository repository;
+    private final TodoRepository repository;
 
-    @Autowired
     public TodoController(TodoRepository repository) {
         this.repository = repository;
     }
 
     @GetMapping
-    public List<Todo> index(@RequestParam(name = "page", defaultValue = "0") Integer page,
-                            @RequestParam(name = "size", defaultValue = "20") Integer size) {
-        return repository.findAll(new PageRequest(page, size)).getContent();
+    public List<Todo> index(@PageableDefault Pageable page) {
+        return repository.findAll(page).getContent();
     }
 
     @GetMapping("{id}")
     public ResponseEntity show(@PathVariable("id") Long id) {
-        if (!repository.exists(id)) return ResponseEntity.notFound().build();
-
-        Todo todo = repository.findOne(id);
-        return ResponseEntity.ok(todo);
+        return repository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -47,23 +45,24 @@ public class TodoController {
 
     @PutMapping("{id}")
     public ResponseEntity update(@PathVariable("id") Long id,
-                                 @RequestBody @Valid Todo todo,
-                                 BindingResult result) {
-        if (result.hasErrors()) return ResponseEntity.unprocessableEntity().build();
-        if (!repository.exists(id)) return ResponseEntity.notFound().build();
-
-        Todo entity = repository.findOne(id);
-        entity.setTitle(todo.getTitle());
-        entity.setCompleted(todo.isCompleted());
-        repository.save(entity);
-        return ResponseEntity.noContent().build();
+                                 @Validated @RequestBody Todo todo) {
+        return repository.findById(id)
+                .map(entity -> {
+                    entity.setTitle(todo.getTitle());
+                    entity.setCompleted(todo.isCompleted());
+                    repository.save(entity);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity destroy(@PathVariable("id") Long id) {
-        if (!repository.exists(id)) return ResponseEntity.notFound().build();
-
-        repository.delete(id);
-        return ResponseEntity.noContent().build();
+        return repository.findById(id)
+                .map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
