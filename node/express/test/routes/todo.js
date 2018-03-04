@@ -33,6 +33,15 @@ describe('Todos', () => {
   });
 
   describe('GET /todos/:id', () => {
+    it('it should GET returns not found', (done) => {
+      chai.request(app)
+        .get('/todos/0')
+        .end((err, res) => {
+          res.should.have.status(404);
+          done();
+        });
+    }); 
+
     it('it should GET a todo by the given id', (done) => {
       const todo = new Todo({
         title: 'string',

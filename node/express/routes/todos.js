@@ -7,25 +7,24 @@ const router = express.Router();
 /**
  * GET /todos
  */
-router.get('/', (req, res, next) => {
-  Todo.find({}).then(todos => {
-      res.json(todos);
-    })
-    .catch(next);
+router.get('/', async (req, res, next) => {
+  const todos = await Todo.find({});
+  res.json(todos);
 });
 
 /**
  * GET /todos/:id
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   const { id } = req.params;
 
-  Todo.findById(id).then((todo) => {
-      if (!todo) return Promise.reject();
-
-      res.json(todo);
-    })
-    .catch(next);
+  try {
+    const todo = await Todo.findById(id);
+    if (!todo) throw new Error();
+    res.json(todo);
+  } catch (e) {
+    next(e);
+  }
 });
 
 /**
